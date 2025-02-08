@@ -4,7 +4,9 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000", { transports: ["websocket"] });
+const socket = io("https://swissmote-backend-uv1m.onrender.com", {
+  transports: ["websocket"],
+});
 
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
@@ -64,9 +66,16 @@ const Dashboard = () => {
 
   const fetchEvents = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/events");
-      setEvents(Array.isArray(res.data) ? res.data : []);
-      res.data.forEach((event) => fetchAttendeeCount(event._id));
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/events`);
+      console.log("API Response:", res.data);
+
+      if (Array.isArray(res.data)) {
+        setEvents(res.data);
+        res.data.forEach((event) => fetchAttendeeCount(event._id));
+      } else {
+        console.error("Expected an array but got:", res.data);
+        setEvents([]);
+      }
     } catch (err) {
       console.error("Error fetching events", err);
       setEvents([]);
@@ -76,7 +85,7 @@ const Dashboard = () => {
   const fetchAttendeeCount = async (eventId) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/event/${eventId}/attendees`
+        `${import.meta.env.VITE_API_URL}/api/event/${eventId}/attendees`
       );
       setAttendees((prev) => ({ ...prev, [eventId]: res.data.count }));
     } catch (err) {
@@ -92,11 +101,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="w-screen flex justify-center items-center flex-col">
-      <h2 className="absolute top-0 text-xl font-semibold bg-gray-600 p-5 m-2 rounded-full text-white">
+    <div className="w-screen h-screen flex justify-around items-center flex-col p-5">
+      <h2 className="absolute top-0 left-0 text-xl font-semibold bg-gray-600 p-5 m-2 rounded-full text-white">
         Event Dashboard
       </h2>
-      <div className="flex w-full justify-center mb-5">
+      <div className="flex w-full justify-center mt-5 mb-5">
         <Link to="/create-event">
           <button className="hover:-translate-x-1 transition ease-linear duration-200">
             Create Event

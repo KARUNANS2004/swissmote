@@ -14,11 +14,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", {
-        name,
-        email,
-        password,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          name,
+          email,
+          password,
+        }
+      );
       login(res.data);
       navigate("/dashboard");
     } catch (err) {
@@ -28,7 +31,7 @@ const Register = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="absolute top-0 text-xl font-semibold bg-gray-600 p-5 m-2 rounded-full text-white">
+      <h2 className="absolute top-0 left-0 text-xl font-semibold bg-gray-600 p-5 m-2 rounded-full text-white">
         Register
       </h2>
       <form onSubmit={handleSubmit}>
@@ -56,7 +59,9 @@ const Register = () => {
         <button type="submit">Register</button>
       </form>
       <div>
-        <Link to={"/login"}>Login</Link>
+        <p>
+          Already registered?<Link to={"/login"}>Login</Link>
+        </p>
       </div>
     </div>
   );
